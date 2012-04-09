@@ -5,4 +5,6 @@ using JavaScript and the html canvas element.
 To run the simulation, just open the index.html file in a browser. The program
 is only tested in Chrome and Firefox so for best results, use one of these.
 
+See it in action at http://davidlebech.dk/fractals/
+
 The code is not licensed. It is Public Domain.
