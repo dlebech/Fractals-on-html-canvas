@@ -1,22 +1,85 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Fractals canvas</title>
-		<meta charset="utf-8" />
-		<script type="text/javascript" src="fractal.js"></script>
-	</head>
-	<body onload="init();">
-		<div style="width: 800px;">
-			<h1>Fractals on html canvas</h1>
-			<p>A good friend of mine, a PhD student in Physics, Rick Montgomery, inspired me to create this little simulation of <a href="http://en.wikipedia.org/wiki/Diffusion-limited_aggregation">Diffusion-limited aggregation</a>.</p>
-			<p>What fascinated me was the simplicity of the simulation where over time, random walks of randomly located particles turn into a nice fractal. The particles stop when they hit a stationary particle. Initially, there is only one stationary particle.</p>
-			<p>In the simulation below, 1000 particles are roaming around. Every time a particle settles down, another random particle will appear until there is a total of 50000 particles.</p>
-			<p>Notice that the simulation is quite CPU intensive. And it is many times faster in Google Chrome than Firefox!</p>
-			<p><a href="#" onclick="init(); return false;">New Fractal</a><br /><a href="#" onclick="startSim(); return false;">Start Simulation</a></p>
-		</div>
-		<canvas id="fractal-canvas" width="400" height="400">Unfortunately, your browser does not support the canvas element. Get the newest Firefox, Chrome, Opera or Safari.</canvas>
-		<div style="width: 800px;">
-			<p>Grab the <a href="https://github.com/dlebech/Fractals-on-html-canvas">source code here</a>.</p>
-		</div>
-	</body>
+    <head>
+        <title>Fractals canvas</title>
+        <meta charset="utf-8" />
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            var computationsPerAnimation = 1;
+
+            jQuery(document).ready(function () {
+                jQuery('#slider').slider({
+                    min: 1,
+                    max: 200,
+                    slide: function (e, ui) {
+                        computationsPerAnimation = ui.value;
+                        jQuery('.ui-slider-handle')
+                            .css('text-decoration', 'none')
+                            .css('text-align', 'center')
+                            .css('padding', '3px')
+                            .css('width', 'auto')
+                            .css('height', 'auto')
+                            .text(ui.value);
+                    }
+                });
+            });
+    
+        function loadFractal(num) {
+            jQuery.getScript(
+                'js/fractal' + num + '.js',
+                function () {
+                    init();
+                    jQuery('#startsim').show();
+                });
+        }
+        
+        window.requestAnimFrame = (function(){
+            return  window.requestAnimationFrame       || 
+            window.webkitRequestAnimationFrame || 
+            window.mozRequestAnimationFrame    || 
+            window.oRequestAnimationFrame      || 
+            window.msRequestAnimationFrame     || 
+            function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+            };
+        })();
+    </script>
+    <style type="text/css">
+        div.section { display: block; margin-bottom: 13px; }
+    </style>
+    </head>
+    <body>
+        <div style="width: 800px;">
+            <h1>Fractals on html canvas</h1>
+            <div class="section">A good friend of mine, a PhD student in Physics, Rick Montgomery, inspired me to create this little simulation of <a href="http://en.wikipedia.org/wiki/Diffusion-limited_aggregation">Diffusion-limited aggregation</a>.</div>
+            <div class="section">What fascinated me was the simplicity of the simulation where over time, random walks of randomly located particles turn into a nice fractal. The particles stop when they hit a stationary particle. Initially, there is only one stationary particle.</div>
+            <div class="section">There is a couple of different variations of the same simulation below.</div>
+            <div class="section">Notice that the simulation is quite CPU intensive. And it is many times faster in Google Chrome than Firefox!</div>
+            <div class="section">
+            <a href="#" onclick="loadFractal(1); return false;">New random walk normal fractal</a>. <br />
+            All particles are randomly located and walk randomly. Therefore, the creation of the fractal takes longer time.
+            </div>
+            <div class="section">
+            <a href="#" onclick="loadFractal(2); return false;">New random walk party fractal</a>.<br />
+            New particles appear when previous particles walk a certain distance away from the evolving fractal. The larger the fractal becomes, the more particles join the party. Each particle walks randomly.
+            </div>
+            <div class="section">
+            <a href="#" onclick="loadFractal(3); return false;">New determined-particle party fractal</a>.<br />
+            New particles appear when previous particles walk a certain distance away from the evolving fractal. The larger the fractal becomes, the more particles join the party. Each particle walk in a predetermined direction.
+            </div>
+            <div id="startsim" style="display: none;" class="section">
+                <div><a href="#" onclick="startSim(); return false;">Start Simulation</a></div>
+                <div>Set number of particle movements per animation cycle:</div>
+                <div id="slider" style="width: 400px;"></div>
+            </div>
+        </div>
+        <div class="section">
+            <canvas id="fractal-canvas" width="400" height="400">Unfortunately, your browser does not support the canvas element. Get the newest Firefox, Chrome, Opera or Safari.</canvas>
+        </div>
+        <div style="width: 800px;">
+            <div class="section">Grab the <a href="https://github.com/dlebech/Fractals-on-html-canvas">source code here</a>.</div>
+        </div>
+    </body>
 </html>

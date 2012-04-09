@@ -27,14 +27,11 @@ function init() {
 		particles = [];
 
 		// Create an initial, immobile particle.
-		createParticle(false);
+		createParticle(false, Math.round(thegrid.length/2 + cwidth/2));
 
 		// Create all other particles
 		for (var i = 0; i < numParticles; i++)
 			createParticle(true);
-
-		// Render the canvas every 100 milliseconds. 
-		setTimeout(drawParticles, 100);
 	}
 }
 
@@ -42,20 +39,21 @@ var running = false;
 function startSim() {
 	// Update particles every 1 milliseconds.
 	running = true;
-	setTimeout(runSim, 5);
+    runSim();
 }
 
-function runSim()
-{
-	// To speed up the process of moving particles without freezing the browser,
-	// a few moves are made before a short wait.
-	for (var i = 0; i < 500; i++) {
-		moveParticles();
-	}
+function runSim() {
+    if (running) {
+    	// To speed up the process of moving particles without freezing the browser,
+    	// a few moves are made before a short wait.
+    	for (var i = 0; i < computationsPerAnimation; i++) {
+    		moveParticles();
+    	}
+    
+        drawParticles();
 
-	// If the simulation is still running, do it over again.
-	if (running)
-		setTimeout(runSim, 5);
+        window.requestAnimFrame(runSim);
+    }
 }
 
 /**
@@ -73,7 +71,6 @@ function drawParticles() {
 	for (var i = 0; i < particles.length; i++) {
 		particles[i].draw();
 	}
-	setTimeout(drawParticles,100);
 }
 
 /**
@@ -185,19 +182,18 @@ function checkPos(oldPos, newPos) {
  * Creates a particle at a random location
  * and adds it to the particle array.
  */
-function createParticle(active) {
+function createParticle(active, pos) {
 	var foundSpot = false;
-	while (!foundSpot)
-	{
-		var pos = Math.floor((Math.random()*thegrid.length));
-		if (!thegrid[pos])
-		{
-			var color = [0,0,0,255];
-			var particle = new Particle(pos, color);
-			thegrid[pos] = particle;
-			particle.active = active;
-			particles.push(particle);
-			foundSpot = true;
-		}
-	}
+    if (pos == null) {
+    	while (!foundSpot) {
+    		pos = Math.floor((Math.random()*thegrid.length));
+		    if (!thegrid[pos])
+                foundSpot = true;
+    	}
+    }
+    var color = [0,0,0,255];
+	var particle = new Particle(pos, color);
+	thegrid[pos] = particle;
+	particle.active = active;
+	particles.push(particle);
 }
