@@ -47,6 +47,7 @@ function init() {
 	if (canvas.getContext) {
 		ctx = canvas.getContext('2d');
 		running = false;
+        lastTimestamp = null;
 
 		// Initialize an empty grid and particle array.
 		thegrid = [];
