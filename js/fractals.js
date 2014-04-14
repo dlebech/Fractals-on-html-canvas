@@ -109,6 +109,10 @@ function resetSim() {
  * Starts the simulation
  */
 function startSim() {
+    // Reset the timestamp. Otherwise, resuming the animation can go bananas.
+    lastTimestamp = null;
+
+    // Start (or resume) the simulation.
 	running = true;
     requestAnimationFrame(simulationStep);
 }
