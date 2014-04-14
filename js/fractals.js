@@ -43,21 +43,21 @@ var stepsPerSecond = 100;
 
 // Initializes the canvas element with some particles.
 function init() {
-	var canvas = document.getElementById('fractal-canvas');
-	if (canvas.getContext) {
-		ctx = canvas.getContext('2d');
-		running = false;
+    var canvas = document.getElementById('fractal-canvas');
+    if (canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        running = false;
         lastTimestamp = null;
 
-		// Initialize an empty grid and particle array.
-		thegrid = [];
-		for (var i = 0; i < pxPoints; i++)
-			thegrid[i] = null;
-		particles = [];
+        // Initialize an empty grid and particle array.
+        thegrid = [];
+        for (var i = 0; i < pxPoints; i++)
+            thegrid[i] = null;
+        particles = [];
         inactiveParticles = [];
 
-		// Create an initial, immobile particle in the center.
-		createParticle(false, Math.round(thegrid.length/2 + cwidth/2));
+        // Create an initial, immobile particle in the center.
+        createParticle(false, Math.round(thegrid.length/2 + cwidth/2));
 
         // Determine the starting number of active particles.
         // For simulations using bounds, this number is quite low but is
@@ -71,7 +71,7 @@ function init() {
             targetActiveParticles = 1000;
             maxActiveParticles = 1000;
         }
-	}
+    }
 }
 
 // Runs a single simulation step.
@@ -84,12 +84,12 @@ function simulationStep(timestamp) {
         // time (which is in milliseconds).
         var elapsedCycles = Math.ceil((timestamp - lastTimestamp) / 1000 * stepsPerSecond);
 
-    	for (var i = 0; i < elapsedCycles; i++) {
+        for (var i = 0; i < elapsedCycles; i++) {
             if (simulationType.useBounds)
                 bounds = findBounds();
             spawnParticles();
-    		moveParticles();
-    	}
+            moveParticles();
+        }
         drawParticles();
 
         lastTimestamp = timestamp;
@@ -121,23 +121,22 @@ function pauseSim() {
     running = false;
 }
 
-
 /**
  * Draws all objects on the canvas.
  */
 function drawParticles() {
-	// Clear the drawing area
-	ctx.clearRect(0, 0, cwidth, cheight);
+    // Clear the drawing area
+    ctx.clearRect(0, 0, cwidth, cheight);
 
-	// Fill with white background
-	ctx.fillStyle = '#FFFFFF';
-	ctx.fillRect(0, 0, cwidth, cheight);
+    // Fill with white background
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, cwidth, cheight);
 
-	// Draw all particles as single pixels.
-	var imgData = ctx.createImageData(cwidth, cheight);
-	for (var i = 0; i < particles.length; i++) {
-		particles[i].draw(imgData.data);
-	}
+    // Draw all particles as single pixels.
+    var imgData = ctx.createImageData(cwidth, cheight);
+    for (var i = 0; i < particles.length; i++) {
+        particles[i].draw(imgData.data);
+    }
     ctx.putImageData(imgData, 0, 0);
 }
 
@@ -145,12 +144,15 @@ function drawParticles() {
  * Moves every particle
  */
 function moveParticles() {
-	// Let the particles walk around 
-	for (var i = 0; i < particles.length; i++) {
-		particles[i].move();
-	}
+    // Let the particles walk around 
+    for (var i = 0; i < particles.length; i++) {
+        particles[i].move();
+    }
 }
 
+/**
+ * Spawns new particles if needed.
+ */
 function spawnParticles() {
     // If the simulation type uses bounds, dynamically increase (or decrease)
     // the target number of particles to create.
@@ -163,7 +165,7 @@ function spawnParticles() {
     // Notice that createParticle is not one hundred percent certain to create
     // a particle. That's ok though. We are in no rush to create particles.
     var activeParticles = particles.length - inactiveParticles.length;
-	for (var i = 0; i < targetActiveParticles-activeParticles; i++) {
+    for (var i = 0; i < targetActiveParticles-activeParticles; i++) {
         createParticle(true);
     }
 }
@@ -174,9 +176,9 @@ function spawnParticles() {
  */
 function posToCoor(pos)
 {
-	x = pos % cwidth;
-	y = Math.floor(pos / cheight);
-	return [x,y];
+    x = pos % cwidth;
+    y = Math.floor(pos / cheight);
+    return [x,y];
 }
 
 /**
@@ -193,54 +195,51 @@ function coorToPos(x, y) {
  * red, green, blue and alpha, e.g. [0,120,255,255]
  */
 function Particle(pos, color, direction) {
-	this.pos = pos;
-	this.color = color;
-	this.active = true;
+    this.pos = pos;
+    this.color = color;
+    this.active = true;
     this.hasMoved = false;
     this.direction = direction;
 
-	/**
-	 * Draws the particle. It's just a point on the grid.
-	 */
-	this.draw = function(data) {
+    /**
+     * Draws the particle. It's just a point on the grid.
+     */
+    this.draw = function(data) {
         var byteOffset = this.pos*4;
-		for (var i = 0; i < this.color.length; i++) {
-			data[byteOffset+i] = this.color[i];
-		}
-	}
-
-    this.changePos = function(newPos) {
-		if (checkPos(this.pos, newPos) && !thegrid[newPos]) {
-			thegrid[newPos] = this;
-			thegrid[this.pos] = null;
-			this.pos = newPos;
-			this.hasMoved = true;
-		}
+        for (var i = 0; i < this.color.length; i++) {
+            data[byteOffset+i] = this.color[i];
+        }
     }
 
-	/**
-	 * Moves the particle one step.
-	 */
-	this.move = function() {
-		// Only move if the particle is active
-		if (this.active)
-		{
-			// First check if the particle can settle down
-			this.settleDown();
-	
-			// If the particle is still active, move it
-			if (this.active)
-			{
-				this.hasMoved = false;
-				var triesLeft = 2; // Ensure we do not get stuck in the loop :-)
-	
-				while (!this.hasMoved && triesLeft > 0)
-				{
+    this.changePos = function(newPos) {
+        if (checkPos(this.pos, newPos) && !thegrid[newPos]) {
+            thegrid[newPos] = this;
+            thegrid[this.pos] = null;
+            this.pos = newPos;
+            this.hasMoved = true;
+        }
+    }
+
+    /**
+     * Moves the particle one step.
+     */
+    this.move = function() {
+        // Only move if the particle is active
+        if (this.active) {
+            // First check if the particle can settle down
+            this.settleDown();
+
+            // If the particle is still active, move it
+            if (this.active) {
+                this.hasMoved = false;
+                var triesLeft = 2; // Ensure we do not get stuck in the loop :-)
+
+                while (!this.hasMoved && triesLeft > 0) {
                     var dirIndex = this.direction || Math.floor(Math.random() * directions.length);
-					var newPos = this.pos + directions[dirIndex];
+                    var newPos = this.pos + directions[dirIndex];
                     this.changePos(newPos);
-					triesLeft--;
-				}
+                    triesLeft--;
+                }
 
                 // Perform special checks for fractals with bounds.
                 if (simulationType.useBounds) {
@@ -266,38 +265,37 @@ function Particle(pos, color, direction) {
                             this.direction = Math.round(Math.random() * 3);
                     }
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 
-	/**
-	 * Determines whether the particle can stop walking
-	 * and settle down on a location.
-	 * Notice that border conditions when moving left/right are not handled.
-	 */
-	this.settleDown = function() {
-		canSettleDown = false;
+    /**
+     * Determines whether the particle can stop walking
+     * and settle down on a location.
+     * Notice that border conditions when moving left/right are not handled.
+     */
+    this.settleDown = function() {
+        canSettleDown = false;
 
-		// Check in all directions of the grid
-		for (var j = 0; j < directions.length; j++)
-		{
-			var newPos = this.pos + directions[j];
-			if (checkPos(this.pos, newPos) && thegrid[newPos] && !thegrid[newPos].active) {
-				canSettleDown = true;
+        // Check in all directions of the grid
+        for (var j = 0; j < directions.length; j++) {
+            var newPos = this.pos + directions[j];
+            if (checkPos(this.pos, newPos) && thegrid[newPos] && !thegrid[newPos].active) {
+                canSettleDown = true;
                 break;
             }
-		}
-		if (canSettleDown) {
-			this.active = false;
+        }
+        if (canSettleDown) {
+            this.active = false;
             inactiveParticles.push(this);
-		}
-	}
+        }
+    }
 }
 
 function checkPos(oldPos, newPos) {
-	if (newPos < 0 || newPos >= pxPoints)
-		return false;
-	return true;
+    if (newPos < 0 || newPos >= pxPoints)
+        return false;
+    return true;
 }
 
 /**
@@ -308,7 +306,7 @@ function createParticle(active, pos) {
     // If no position is specified, try and find a spot. Only try once.
     if (pos == null) {
         if (simulationType == SimulationType.Random)
-        	pos = Math.floor((Math.random()*thegrid.length));
+            pos = Math.floor((Math.random()*thegrid.length));
         else
             pos = findPositionInBounds();
     }
@@ -319,10 +317,10 @@ function createParticle(active, pos) {
         var direction = null;
         if (simulationType == SimulationType.DeterminedBound)
             direction = Math.round(Math.random() * 3);
-	    var particle = new Particle(pos, color, direction);
-	    thegrid[pos] = particle;
-	    particle.active = active;
-	    particles.push(particle);
+        var particle = new Particle(pos, color, direction);
+        thegrid[pos] = particle;
+        particle.active = active;
+        particles.push(particle);
         if (!active)
             inactiveParticles.push(particle);
     }
@@ -341,25 +339,21 @@ function findPositionInBounds() {
     if (Math.round(Math.random()) == 0) {
         y = Math.random() * (bounds[3] - bounds[2]) + bounds[2];
         // Use left bound
-        if (Math.round(Math.random()) == 0) {
+        if (Math.round(Math.random()) == 0)
             x = bounds[0] + offsetShort;
-        }
         // Use right bound
-        else {
+        else
             x = bounds[1] - offsetShort;
-        }
     }
     // Use upper/lower bound
     else {
         x = Math.random() * (bounds[1] - bounds[0]) + bounds[0];
         // Use upper bound
-        if (Math.round(Math.random()) == 0) {
+        if (Math.round(Math.random()) == 0)
             y = bounds[2] + offsetShort;
-        }
         // Use lower bound
-        else {
+        else
             y = bounds[3] - offsetShort;
-        }
     }
 
     return coorToPos(Math.round(x), Math.round(y));
@@ -376,7 +370,7 @@ function findBounds() {
         var coor = posToCoor(inactiveParticles[i].pos);
         var x = coor[0];
         var y = coor[1];
-    
+
         if (x < minx)
             minx = x;
         if (x > maxx)
