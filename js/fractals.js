@@ -113,7 +113,7 @@ function startSim() {
     lastTimestamp = null;
 
     // Start (or resume) the simulation.
-	running = true;
+    running = true;
     requestAnimationFrame(simulationStep);
 }
 
